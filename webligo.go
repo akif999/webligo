@@ -9,11 +9,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const (
-	EnToJp = iota
-	JpToEn
-)
-
 var (
 	searchWord = kingpin.Arg("searchWord", "searchWord string").Required().String()
 )
@@ -21,17 +16,11 @@ var (
 func main() {
 	kingpin.Parse()
 
-	// if searchWord includes multibyte charactor, set mode to JpToEn
-	mode := EnToJp
-	if utf8.RuneCountInString(*searchWord) != len(*searchWord) {
-		mode = JpToEn
-	}
-
 	doc, err := goquery.NewDocument("http://ejje.weblio.jp/content/" + *searchWord)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if mode == EnToJp {
+	if isIncludeMultibyte(*searchWord) {
 		fmt.Printf("単語             : %s\n", *searchWord)
 		fmt.Printf("主な意味         : %s\n", doc.Find(".content-explanation").Text())
 		fmt.Printf("音節             : %s\n", doc.Find(".syllableEjje").Text())
@@ -40,4 +29,11 @@ func main() {
 		fmt.Printf("日単語           : %s\n", *searchWord)
 		fmt.Printf("英単語           : %s\n", doc.Find(".content-explanation").Text())
 	}
+}
+
+func isIncludeMultibyte(str string) bool {
+	if utf8.RuneCountInString(str) != len(str) {
+		return true
+	}
+	return false
 }
