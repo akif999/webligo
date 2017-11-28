@@ -31,6 +31,10 @@ func TestIsIncludeMultibyte(t *testing.T) {
 			"○",
 			true,
 		},
+		{
+			"Goラング",
+			true,
+		},
 	}
 
 	for i, test := range tests {
