@@ -9,6 +9,18 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+type JpEn struct {
+	JpWord string
+	EnWord string
+}
+
+type EnJp struct {
+	Word           string
+	Meaning        string
+	Syllable       string
+	PhoneticSymbol string
+}
+
 var (
 	word = kingpin.Arg("word", "target word").Required().String()
 )
@@ -21,14 +33,32 @@ func main() {
 		log.Fatal(err)
 	}
 	if isIncludeMultibyte(*word) {
-		fmt.Printf("日単語           : %s\n", *word)
-		fmt.Printf("英単語           : %s\n", doc.Find(".content-explanation").Text())
+		je := &JpEn{
+			JpWord: *word,
+			EnWord: doc.Find(".content-explanation").Text(),
+		}
+		je.String()
 	} else {
-		fmt.Printf("単語             : %s\n", *word)
-		fmt.Printf("主な意味         : %s\n", doc.Find(".content-explanation").Text())
-		fmt.Printf("音節             : %s\n", doc.Find(".syllableEjje").Text())
-		fmt.Printf("発音記号・読み方 : %s\n", doc.Find(".phoneticEjjeDesc").Text())
+		ej := &EnJp{
+			Word:           *word,
+			Meaning:        doc.Find(".content-explanation").Text(),
+			Syllable:       doc.Find(".syllableEjje").Text(),
+			PhoneticSymbol: doc.Find(".phoneticEjjeDesc").Text(),
+		}
+		ej.String()
 	}
+}
+
+func (j *JpEn) String() {
+	fmt.Printf("日単語           : %s\n", j.JpWord)
+	fmt.Printf("英単語           : %s\n", j.EnWord)
+}
+
+func (e *EnJp) String() {
+	fmt.Printf("単語             : %s\n", e.Word)
+	fmt.Printf("主な意味         : %s\n", e.Meaning)
+	fmt.Printf("音節             : %s\n", e.Syllable)
+	fmt.Printf("発音記号・読み方 : %s\n", e.PhoneticSymbol)
 }
 
 func isIncludeMultibyte(str string) bool {
